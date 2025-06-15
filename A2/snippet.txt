@@ -1,0 +1,20 @@
+<model-viewer src="dadve FINISHEDglb.glb" ar ar-modes="webxr scene-viewer quick-look" camera-controls tone-mapping="neutral" poster="poster.webp" shadow-intensity="1">
+    <button class="Hotspot" slot="hotspot-2" data-surface="15 0 432 433 434 0.714 0.149 0.137" data-visibility-attribute="visible">
+        <div class="HotspotAnnotation">Panel 1</div>
+    </button><button class="Hotspot" slot="hotspot-3" data-surface="3 0 267 268 269 0.415 0.094 0.492" data-visibility-attribute="visible">
+        <div class="HotspotAnnotation">Panel 2</div>
+    </button><button class="Hotspot" slot="hotspot-4" data-surface="9 0 648 649 650 0.503 0.018 0.479" data-visibility-attribute="visible">
+        <div class="HotspotAnnotation">Panel 3</div>
+    </button><button class="Hotspot" slot="hotspot-5" data-surface="12 0 3 4 5 0.495 0.421 0.084" data-visibility-attribute="visible">
+        <div class="HotspotAnnotation">Interactive screen</div>
+    </button>
+    <div class="progress-bar hide" slot="progress-bar">
+        <div class="update-bar"></div>
+    </div>
+    <button slot="ar-button" id="ar-button">
+        View in your space
+    </button>
+    <div id="ar-prompt">
+        <img src="https://modelviewer.dev/shared-assets/icons/hand.png">
+    </div>
+</model-viewer>

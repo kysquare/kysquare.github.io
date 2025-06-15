@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Model Viewer Variant Switch</title>
+    <meta charset="utf-8" />
+    <meta name="description" content="3D Model Viewer with Material Variants" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link type="text/css" href="./styles.css" rel="stylesheet" />
+
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow: hidden;
+        font-family: 'Segoe UI', sans-serif;
+      }
+
+      
+
+      #viewer-container {
+        width: 100vw;
+        height: 100vh;
+        transition: background 0.8s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
+
+      model-viewer {
+        width: 100%;
+        height: 100%;
+      }
+
+      /* Variant Background Styles (Updated) */
+      #viewer-container.variant-v1 {
+        background: linear-gradient(135deg, #f2f2ec 0%, #c2d1c2 100%);
+      }
+
+      #viewer-container.variant-v2 {
+        background: linear-gradient(135deg, #ede7dd 0%, #bca183 100%);
+      }
+
+      #viewer-container.variant-v3 {
+        background: linear-gradient(135deg, #f6f1f5 0%, #d1acc7 100%);
+      }
+
+      /* Left buttons container holding Material + Animation side by side */
+      #left-buttons {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  display: flex;
+  flex-direction: column; /* <== changed from row to column */
+  gap: 15px;
+  z-index: 10;
+}
+
+
+      /* Material Buttons */
+      #variant-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        padding: 10px 15px;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      }
+
+      /* Animation Buttons */
+      #animation-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        padding: 10px 15px;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      }
+
+      /* View Buttons on top-right */
+      #view-buttons {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        z-index: 10;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        padding: 10px 15px;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      }
+
+      /* Shared button styles */
+      #variant-buttons button,
+      #animation-buttons button,
+      #view-buttons button {
+        padding: 10px 18px;
+        font-size: 15px;
+        font-weight: 600;
+        background-color: #ffffffcc;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      #variant-buttons button:hover,
+      #animation-buttons button:hover,
+      #view-buttons button:hover {
+        background-color: #fff;
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
+
+      #variant-buttons button:focus,
+      #animation-buttons button:focus,
+      #view-buttons button:focus {
+        outline: none;
+        border-color: #888;
+      }
+
+      /* Variant-specific button styles for better color harmony */
+      /* Variant 1: greenish soft */
+      #viewer-container.variant-v1 #variant-buttons button,
+      #viewer-container.variant-v1 #animation-buttons button,
+      #viewer-container.variant-v1 #view-buttons button {
+        background-color: rgba(255, 255, 255, 0.8);
+        color: #4a5a4a;
+        border-color: #a3b2a3;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      #viewer-container.variant-v1 #variant-buttons button:hover,
+      #viewer-container.variant-v1 #animation-buttons button:hover,
+      #viewer-container.variant-v1 #view-buttons button:hover {
+        background-color: #f9f9f9;
+        color: #2f3a2f;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+      }
+
+      /* Variant 2: warm beige/tan */
+      #viewer-container.variant-v2 #variant-buttons button,
+      #viewer-container.variant-v2 #animation-buttons button,
+      #viewer-container.variant-v2 #view-buttons button {
+        background-color: rgba(255, 247, 237, 0.85);
+        color: #6b563f;
+        border-color: #c1ad8f;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      #viewer-container.variant-v2 #variant-buttons button:hover,
+      #viewer-container.variant-v2 #animation-buttons button:hover,
+      #viewer-container.variant-v2 #view-buttons button:hover {
+        background-color: #fff7e8;
+        color: #4a3b27;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+      }
+
+      /* Variant 3: soft lavender pink */
+      #viewer-container.variant-v3 #variant-buttons button,
+      #viewer-container.variant-v3 #animation-buttons button,
+      #viewer-container.variant-v3 #view-buttons button {
+        background-color: rgba(244, 233, 240, 0.85);
+        color: #7a5f75;
+        border-color: #b59eb0;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      #viewer-container.variant-v3 #variant-buttons button:hover,
+      #viewer-container.variant-v3 #animation-buttons button:hover,
+      #viewer-container.variant-v3 #view-buttons button:hover {
+        background-color: #f8eef5;
+        color: #553d58;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+      }
+      /* Hotspot buttons improved visibility and style */
+      .Hotspot {
+        opacity: 0.85;              /* Slightly decreased opacity */
+        pointer-events: auto;
+        cursor: pointer;
+        position: relative;
+        width: 28px;                /* Slightly bigger */
+        height: 28px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.9); /* More solid white but with slight transparency */
+        border: 2.5px solid #444;   /* Darker border for better contrast */
+        box-shadow: 0 0 8px 2px rgba(255, 255, 255, 0.6); /* Subtle glow */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.3s ease, box-shadow 0.3s ease;
+        user-select: none;
+        z-index: 5;
+      }
+
+      /* Slightly stronger glow on hover */
+      .Hotspot:hover {
+        background: rgba(255, 255, 255, 1);
+        box-shadow: 0 0 12px 4px rgba(255, 255, 255, 0.9);
+      }
+
+      /* Hide hotspot annotations by default */
+      .HotspotAnnotation {
+        display: none;
+      }
+      /* Show annotation only when hotspot is focused (clicked or tabbed) */
+      .Hotspot:focus .HotspotAnnotation,
+      .Hotspot:active .HotspotAnnotation {
+        display: block;
+        position: absolute;
+        top: 36px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0,0,0,0.75);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 6px;
+        white-space: nowrap;
+        font-size: 13px;
+        pointer-events: none;
+        user-select: none;
+        z-index: 10;
+      }
+
+/* BURGER BUTTON for mobile */
+#burger-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 48px;
+  height: 48px;
+  background-color: rgba(255, 255, 255, 0.85);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 28px;
+  font-weight: bold;
+  line-height: 1;
+  display: none; /* hidden by default, only show on mobile */
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 20;
+  transition: background-color 0.3s ease;
+}
+#burger-button:hover {
+  background-color: rgba(255, 255, 255, 1);
+}
+
+/* Show burger button only on mobile (max-width 768px) */
+@media (max-width: 768px) {
+  #burger-button {
+    display: flex;
+  }
+  /* Hide controls by default on mobile */
+  #left-buttons,
+  #view-buttons {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  /* Show controls when toggled */
+  #left-buttons.show,
+  #view-buttons.show {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+}
+
+
+    </style>
+  </head>
+
+  <body>
+    <!-- Checkbox to toggle hotspots -->
+<div style="position: absolute; bottom: 20px; left: 20px; z-index: 10; background: rgba(255,255,255,0.7); padding: 8px 12px; border-radius: 8px;">
+  <label>
+    <input type="checkbox" id="toggle-hotspots" checked />
+    Show Hotspots
+  </label>
+</div>
+
+    <div id="viewer-container" class="variant-v1">
+      <model-viewer
+        id="A2"
+        src="dadve FINISHEDglb.glb"
+        ar
+        ar-modes="webxr scene-viewer quick-look"
+        camera-controls
+        tone-mapping="neutral"
+        poster="poster.webp"
+        shadow-intensity="1"
+        exposure="1"
+        environment-image="neutral"
+        camera-orbit="0deg 75deg 6.5m"
+        camera-target="0m 1m 0m"
+        transition-duration="1000"
+        style="background-color: transparent"
+      >
+        <!-- Hotspots -->
+        <button
+          class="Hotspot"
+          slot="hotspot-2"
+          data-surface="15 0 432 433 434 0.714 0.149 0.137"
+          data-visibility-attribute="visible"
+          tabindex="0"
+          aria-label="Panel 1 hotspot"
+        >
+          <div class="HotspotAnnotation">Panel 1</div>
+        </button>
+        <button
+          class="Hotspot"
+          slot="hotspot-3"
+          data-surface="3 0 267 268 269 0.415 0.094 0.492"
+          data-visibility-attribute="visible"
+          tabindex="0"
+          aria-label="Panel 2 hotspot"
+        >
+          <div class="HotspotAnnotation">Panel 2</div>
+        </button>
+        <button
+          class="Hotspot"
+          slot="hotspot-4"
+          data-surface="9 0 648 649 650 0.503 0.018 0.479"
+          data-visibility-attribute="visible"
+          tabindex="0"
+          aria-label="Panel 3 hotspot"
+        >
+          <div class="HotspotAnnotation">Panel 3</div>
+        </button>
+        <button
+          class="Hotspot"
+          slot="hotspot-5"
+          data-surface="12 0 3 4 5 0.495 0.421 0.084"
+          data-visibility-attribute="visible"
+          tabindex="0"
+          aria-label="Interactive screen hotspot"
+        >
+          <div class="HotspotAnnotation">Interactive screen</div>
+        </button>
+
+        <!-- Loading and AR -->
+        <div class="progress-bar hide" slot="progress-bar">
+          <div class="update-bar"></div>
+        </div>
+        <button slot="ar-button" id="ar-button">View in your space</button>
+        <div id="ar-prompt"><img src="ar_hand_prompt.png" /></div>
+      </model-viewer>
+
+      <!-- Left Buttons: Material + Animation side by side -->
+      <div id="left-buttons">
+        <div id="variant-buttons">
+          <button onclick="VBtn01()">Original</button>
+          <button onclick="VBtn02()">Wood</button>
+          <button onclick="VBtn03()">Metal</button>
+        </div>
+
+        <div id="animation-buttons">
+          <button onclick="playAnimation('ArmatureAction')">Panel full turn</button>
+          <button onclick="playAnimation('ArmatureAction.001')">Exploded</button>
+          <button onclick="playAnimation('ArmatureAction.002')">Panel slight turn</button>
+          <button onclick="stopAnimation()">Stop Animation</button>
+        </div>
+      </div>
+
+      <!-- View Buttons on top-right -->
+      <div id="view-buttons">
+        <button onclick="setView('top')">Top</button>
+        <button onclick="setView('bottom')">Bottom</button>
+        <button onclick="setView('front')">Front</button>
+        <button onclick="setView('back')">Back</button>
+        <button onclick="setView('left')">Left</button>
+        <button onclick="setView('right')">Right</button>
+      </div>
+      <button id="burger-button" aria-label="Toggle controls" aria-expanded="false" aria-controls="left-buttons view-buttons">
+  ☰
+</button>
+    </div>
+
+    <script>
+      const viewer = document.getElementById('A2');
+      const container = document.getElementById('viewer-container');
+
+      viewer.addEventListener('load', () => {
+        console.log('Model loaded and ready');
+      });
+
+      function setVariant(name) {
+        viewer.variantName = name;
+        container.classList.remove('variant-v1', 'variant-v2', 'variant-v3');
+        container.classList.add(`variant-${name}`);
+      }
+
+      function VBtn01() {
+        setVariant('v1');
+      }
+      function VBtn02() {
+        setVariant('v2');
+      }
+      function VBtn03() {
+        setVariant('v3');
+      }
+
+      function playAnimation(animationName) {
+        viewer.animationName = animationName;
+        viewer.currentTime = 0;
+        viewer.play();
+
+        // Zoom out with increased distance for all animations (6.5m)
+        viewer.cameraOrbit = '0deg 75deg 6.5m';
+        viewer.cameraTarget = '0m 1m 0m';
+      }
+
+      function stopAnimation() {
+        viewer.pause();
+        viewer.animationName = ''; // clears animation if supported
+        // Reset camera to default closer view (but here we keep far zoom)
+        viewer.cameraOrbit = '0deg 75deg 6.5m';
+        viewer.cameraTarget = '0m 1m 0m';
+      }
+
+      function setView(viewName) {
+        const distance = '6.5m'; // far zoom distance for all views
+        let orbit;
+        switch (viewName) {
+          case 'top':
+            orbit = `0deg 0deg ${distance}`; // looking down from top
+            break;
+          case 'bottom':
+            orbit = `0deg 180deg ${distance}`; // looking up from bottom
+            break;
+          case 'front':
+            orbit = `0deg 90deg ${distance}`; // front view
+            break;
+          case 'back':
+            orbit = `180deg 90deg ${distance}`; // back view (rotate 180deg horizontally)
+            break;
+          case 'left':
+            orbit = `90deg 90deg ${distance}`; // left side view
+            break;
+          case 'right':
+            orbit = `-90deg 90deg ${distance}`; // right side view
+            break;
+          default:
+            orbit = `0deg 0deg ${distance}`;
+        }
+        viewer.cameraOrbit = orbit;
+        viewer.cameraTarget = '0m 1m 0m';
+      }
+      // Toggle visibility of all hotspots using checkbox
+document.getElementById('toggle-hotspots').addEventListener('change', function () {
+  const show = this.checked;
+  document.querySelectorAll('.Hotspot').forEach(hotspot => {
+    hotspot.style.display = show ? 'flex' : 'none';
+  });
+});
+
+    </script>
+
+    <script>
+      const burgerButton = document.getElementById('burger-button');
+const leftButtons = document.getElementById('left-buttons');
+const viewButtonsContainer = document.getElementById('view-buttons');
+
+burgerButton.addEventListener('click', () => {
+  const isShown = leftButtons.classList.toggle('show');
+  viewButtonsContainer.classList.toggle('show', isShown);
+
+  // Update aria-expanded attribute for accessibility
+  burgerButton.setAttribute('aria-expanded', isShown ? 'true' : 'false');
+});
+
+    </script>
+    <script
+      type="module"
+      src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"
+    ></script>
+  </body>
+</html>
